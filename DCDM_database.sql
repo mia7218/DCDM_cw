@@ -51,3 +51,6 @@ REFERENCES Parameter_Description(parameter_id);
 
 ALTER TABLE Parameter_Description ADD FOREIGN KEY (IMPC_parameter_origin_id)
 REFERENCES Phenotype_Procedure (IMPC_parameter_origin_id);
+
+#changing gene_accession_id in 'data' table to be the foreign key of gene_accession_id from 'human disease' table
+ALTER TABLE dcdmlocal.data add foreign key (gene_accession_id) references human_disease(gene_accession_id)
