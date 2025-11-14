@@ -22,7 +22,7 @@ CREATE TABLE Parameter_Description (
 CREATE TABLE Phenotype_Procedure (
 
 	IMPC_parameter_origin_id int NOT NULL PRIMARY KEY AUTO_INCREMENT,
-	procedure_name varchar(),
-	preocedure_description varchar(),
-	is_mandatory BOOLEAN()
+	procedure_name varchar(100),
+	procedure_description varchar(200),
+	is_mandatory BOOLEAN
 ); 
