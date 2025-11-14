@@ -26,3 +26,9 @@ CREATE TABLE Phenotype_Procedure (
 	procedure_description varchar(200),
 	is_mandatory BOOLEAN
 ); 
+
+#create query genes table
+CREATE TABLE Query_Genes (
+	 gene_symbol int NOT NULL PRIMARY KEY AUTO_INCREMENT
+	
+); 
