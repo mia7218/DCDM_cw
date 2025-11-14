@@ -7,16 +7,16 @@ CREATE TABLE Data (
     mouse_life_stage varchar(17),
     parameter_id VARCHAR(20) CHARACTER SET utf8mb4 NOT NULL,
     parameter_name varchar(74),
-    pvalue varchar (20)
+    pvalue varchar (20),
 );
 
 
-#create parameter description 
+#create parameter description table
 CREATE TABLE Parameter_Description (
     parameter_id varchar(20) CHARACTER SET utf8mb4 NOT NULL PRIMARY KEY,
     name varchar(100),
     description varchar(300),
-    origin_id int(5)
+    IMPC_parameter_origin_id int(5)
    
 );
 
@@ -44,9 +44,10 @@ create table Human_Disease(
 	OMIM_id varchar(300)
 	); 
 
+#add foreign keys
 
-ALTER TABLE Data
-ADD CONSTRAINT fk_data_parameter
-FOREIGN KEY (parameter_id)
+ALTER TABLE Data ADD FOREIGN KEY (parameter_id)
 REFERENCES Parameter_Description(parameter_id);
 
+ALTER TABLE Parameter_Description ADD FOREIGN KEY (IMPC_parameter_origin_id)
+REFERENCES Phenotype_Procedure (IMPC_parameter_origin_id);
