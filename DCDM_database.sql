@@ -35,7 +35,7 @@ CREATE TABLE Query_Genes (
 );
 
 #Creating "human disease" table
-create table "Human_disease"(
+create table Human_disease(
 	gene_association_id varchar(15) not null PRIMARY KEY,
 	DO_disease_id varchar(15),
 	DO_disease_name	varchar(70),
