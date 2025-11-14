@@ -1,0 +1,19 @@
+#create data table
+CREATE TABLE Data (
+    analysis_id int NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    gene_accession_id varchar(15),
+    gene_symbol varchar(30),
+    mouse_strain varchar(5),
+    mouse_life_stage varchar(17),
+    parameter_id varchar (20),
+    parameter_name varchar(74),
+    pvalue varchar (20)
+); 
+
+#create parameter description 
+CREATE TABLE Parameter_Description (
+    parameter_id int NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    name varchar(100),
+    description varchar(300),
+    origin_id int(5)
+); 
