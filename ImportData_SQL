@@ -24,9 +24,9 @@ You should see:
 
 Property (Name)               Value
 	
-allowLoadLocalInfile	       true
-allowLocalInfile	           true
-allowUrlInLocalInfile	       true
+allowLoadLocalInfile	       false
+allowLocalInfile	           false
+allowUrlInLocalInfile	       false
 
 
 Change this to: 
