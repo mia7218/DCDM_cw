@@ -1,0 +1,103 @@
+How to import data into SQL
+
+•	Both MySQL and DBeaver must allow you to import data - it is currently disabled.
+
+
+1.	MySQL must say local_infile = ON,
+
+On the SQL script type: 
+
+SHOW VARIABLES LIKE 'local_infile';
+
+SET GLOBAL local_infile = 1;
+
+Output: local_infile | ON
+
+
+2.	DBeaver’s MySQL driver must also allow it.
+
+To do this: 
+
+Right click Local host  - choose Edit Connections  - click  Driver Properties
+
+You should see:
+
+Property (Name)               Value
+	
+allowLoadLocalInfile	       true
+allowLocalInfile	           true
+allowUrlInLocalInfile	       true
+
+
+Change this to: 
+
+•	Inside Driver properties, scroll the list (or use the search box).
+If the properties are missing, you must add them manually.
+
+Add/change the following to true:
+
+Property (Name)               Value
+	
+allowLoadLocalInfile	       true
+allowLocalInfile	           true
+allowUrlInLocalInfile	       true
+
+How to add a property:
+1.	Click Add Property (bottom right of the window)
+2.	Enter the name (e.g., allowLoadLocalInfile)
+3.	Hit Enter
+4.	Enter the value true
+5.	Hit Finish 
+
+•	Restart you connection 
+
+To Check it worked: 
+
+TEST 1 — Run the MySQL variable check
+
+In DBeaver, run this SQL:
+
+SHOW VARIABLES LIKE 'local_infile';
+
+If it returns:
+local_infile | ON
+
+Your MySQL server allows LOCAL INFILE.
+If it shows OFF → server is blocking it (not DBeaver).
+
+
+TEST 2 — Test the DBeaver + JDBC driver
+Run this inside DBeaver:
+
+SELECT @local_infile;
+
+If result is 1, the client AND server both allow it.
+If result is 0, then:
+
+•	You added the driver property in the wrong place
+OR
+•	You didn’t restart the connection
+
+    Was able to load data using this code: 
+
+-- load data parameter description data into table--
+LOAD DATA LOCAL INFILE '/Users/ayanabdillahi/Desktop/Group4 /Cleaned_parameter_description.csv' 
+INTO TABLE Parameter_Description 
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS
+(ImpcParameterOrigId, name, description, parameterId)
+
+But it showed this output: Duplicate entry '' for key 'parameter_description.PRIMARY'
+*Might need to change the code up a bit. 
+
+    Imported data for Phenotype_Procedure
+
+•	Had to increase the VARCHAR size because the procedure description was too long for the column. It exceeded 200 characters (the actual length was approximately 546).
+
+#data too long for column
+ALTER TABLE Phenotype_Procedure 
+MODIFY description VARCHAR(600);
+
+Then it was able to import . 
