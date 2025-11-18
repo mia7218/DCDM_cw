@@ -252,10 +252,24 @@ REFERENCES Parameter_Description(parameter_id);
 
 
 # looking at the data
-SELECT COUNT(*) FROM Human_Disease;
-SELECT * FROM Human_Disease LIMIT 10;
+SELECT COUNT(*) FROM Parameter_Groups ;
+SELECT * FROM Parameter_Groups LIMIT 10;
 
+SELECT COUNT(*) FROM Parameter_Group_relation;
+SELECT * FROM Parameter_Group_relation LIMIT 10;
 
+DROP TABLE IF EXISTS Parameter_Group_relation; 
+CREATE TABLE parameter_group_relation (
+    parameter_id VARCHAR(50),
+    category VARCHAR(50)
+);
 
+LOAD DATA LOCAL INFILE '/Users/ayanabdillahi/Desktop/Group4 /Groups_of_Parameters.csv'
+INTO TABLE parameter_group_relation
+FIELDS TERMINATED BY ','
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES
+(parameter_id, category);
 
-
+SELECT COUNT(*) FROM Parameter_Group_relation;
+SELECT * FROM Parameter_Group_relation LIMIT 10;
