@@ -273,3 +273,5 @@ IGNORE 1 LINES
 
 SELECT COUNT(*) FROM Parameter_Group_relation;
 SELECT * FROM Parameter_Group_relation LIMIT 10;
+DROP TABLE Parameter_Groups;
+DROP TABLE parameter_group_staging;
