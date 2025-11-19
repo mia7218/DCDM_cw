@@ -84,7 +84,7 @@ SELECT COUNT(*) FROM Phenotype_Procedure;
 SELECT * FROM Phenotype_Procedure LIMIT 10;
  # it Worked Now 
 
-LOAD DATA LOCAL INFILE '/Users/ayanabdillahi/Desktop/Group4 /Cleaned_parameter_description.csv'
+LOAD DATA LOCAL INFILE '/Users/ayanabdillahi/Desktop/Group4 /updated_parameter_descriptions.csv'
 INTO TABLE Parameter_Description
 FIELDS TERMINATED BY ','
 OPTIONALLY ENCLOSED BY '"'
@@ -112,6 +112,8 @@ SET group_name = @category;
 SELECT COUNT(*) FROM Parameter_Groups;
 SELECT * FROM Parameter_Groups LIMIT 10;
 # Above it make sense to output only the differn groups. - look at chat 
+
+ALTER TABLE Parameter_Groups DROP INDEX group_name; 
 
 CREATE TABLE parameter_group_staging (
     parameter_id VARCHAR(50),
@@ -159,7 +161,7 @@ SELECT COUNT(*) FROM Human_Disease;
 SELECT * FROM Human_Disease LIMIT 10; #Might need to change the primary key here there are two disease_id headings 
 
 #Only importing colomuns 1 and 2 from clean data 2 
-LOAD DATA LOCAL INFILE '/Users/ayanabdillahi/Desktop/Group4 /clean_data2.csv'
+LOAD DATA LOCAL INFILE '/Users/ayanabdillahi/Desktop/Group4 /clean_data.csv'
 INTO TABLE Gene
 FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
@@ -173,7 +175,7 @@ SET
 SELECT COUNT(*) FROM Gene;
 SELECT * FROM Gene LIMIT 10;
 
-LOAD DATA LOCAL INFILE '/Users/ayanabdillahi/Desktop/Group4 /clean_data2.csv'
+LOAD DATA LOCAL INFILE '/Users/ayanabdillahi/Desktop/Group4 /clean_data.csv'
 INTO TABLE Data
 FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
@@ -206,7 +208,7 @@ CREATE TABLE Data (
     parameter_name    VARCHAR(255)
 );
 
-LOAD DATA LOCAL INFILE '/Users/ayanabdillahi/Desktop/Group4 /clean_data2.csv'
+LOAD DATA LOCAL INFILE '/Users/ayanabdillahi/Desktop/Group4 /clean_data.csv'
 INTO TABLE Data
 FIELDS TERMINATED BY ','
 OPTIONALLY ENCLOSED BY '"'
@@ -222,6 +224,10 @@ IGNORE 1 LINES
     pvalue,
     parameter_name
 );
+
+SELECT * FROM Data LIMIT 10;
+
+SELECT COUNT(*) FROM Data;
 
 SET pvalue = NULLIF(@pval, ''); #Should we add this rule. i have not run the code yet. 
 
@@ -273,7 +279,149 @@ IGNORE 1 LINES
 
 SELECT COUNT(*) FROM Parameter_Group_relation;
 SELECT * FROM Parameter_Group_relation LIMIT 10;
+
 DROP TABLE Parameter_Groups;
 DROP TABLE parameter_group_staging;
 
-# Need to re-do all the Foreign keys again 
+ALTER TABLE Data
+ADD FOREIGN KEY (parameter_id)
+REFERENCES Parameter_Description(parameter_id);
+
+ALTER TABLE parameter_group_relation
+ADD FOREIGN KEY (parameter_id)
+REFERENCES Parameter_Description(parameter_id);
+
+SELECT pgr.parameter_id
+FROM parameter_group_relation pgr
+LEFT JOIN Parameter_Description pd
+       ON pgr.parameter_id = pd.parameter_id
+WHERE pd.parameter_id IS NULL;
+
+#Creatign a new parameter Group Relation 
+DROP TABLE if EXISTS parameter_group_relation; 
+CREATE TABLE Parameter_Group_relation (
+    parameter_id VARCHAR(50) NOT NULL,
+    Category TEXT NOT NULL,
+    PRIMARY KEY (parameter_id)
+);
+
+#Loading data into parameter group relation table 
+LOAD DATA LOCAL INFILE '/Users/ayanabdillahi/Desktop/Group4 /Groups_of_Parameters.csv'
+INTO TABLE Parameter_Group_relation
+FIELDS TERMINATED BY ','
+OPTIONALLY ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES
+(parameter_id, Category);
+
+SELECT COUNT(*) FROM parameter_group_relation;
+SELECT * FROM parameter_group_relation LIMIT 212; 
+
+ALTER TABLE Parameter_Group_relation
+ADD FOREIGN KEY (parameter_id)
+REFERENCES Parameter_Description(parameter_id);
+
+#cant make a foreign key - there is a mismatch somwehere . all Parameter Ids are the same its something else, need to find out 
+SELECT parameter_id
+FROM Parameter_Group_relation
+WHERE parameter_id NOT IN (
+    SELECT parameter_id FROM Parameter_Description
+);
+
+SELECT parameter_id, LENGTH(parameter_id)
+FROM Parameter_Group_relation
+WHERE parameter_id NOT IN (
+    SELECT TRIM(parameter_id) FROM Parameter_Description
+);
+# changed INt & removed Auto increment (below)
+DROP TABLE if EXISTS Human_Disease;
+CREATE TABLE Human_Disease (
+    DO_disease_id   VARCHAR(15) NOT NULL PRIMARY KEY,   
+    DO_disease_name VARCHAR(70),
+    OMIM_id         VARCHAR(300),
+    Mouse_MGI_ID    VARCHAR(50)
+);
+
+ #Human_Disease Table 
+LOAD DATA INFILE '/Users/ayanabdillahi/Desktop/Group4 /Cleaned_disease_info.csv'
+INTO TABLE Human_Disease
+FIELDS TERMINATED BY ','
+OPTIONALLY ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES
+(DO_disease_id, DO_disease_name, OMIM_id, Mouse_MGI_ID);
+
+SELECT COUNT(*) FROM Human_Disease;
+SELECT * FROM Human_Disease LIMIT 10; 
+
+ALTER TABLE Gene_Disease_Relation
+ADD COLUMN DO_disease_id VARCHAR(255);
+
+ALTER TABLE Gene_Disease_Relation DROP COLUMN disease_id;
+
+ALTER TABLE Gene_Disease_Relation
+ADD FOREIGN KEY (DO_disease_id)
+REFERENCES Human_Disease(DO_disease_id);
+
+ALTER TABLE Human_Disease
+DROP COLUMN disease_id;
+
+ALTER TABLE Data
+ADD FOREIGN KEY (parameter_id)
+REFERENCES Parameter_Description(parameter_id);
+
+SELECT DISTINCT d.parameter_id
+FROM Data d
+LEFT JOIN Parameter_Description p
+       ON d.parameter_id = p.parameter_id
+WHERE p.parameter_id IS NULL;  - # Cant link Data and PD because the Parameter ID's in these table dont match - run the code to see which. 
+
+ALTER TABLE Parameter_Group_relation
+ADD FOREIGN KEY (parameter_id)
+REFERENCES Parameter_Description(parameter_id); # Cant Link because some rows in Parameter_Group_relation have parameter_id values that are not present in the main Parameter_Description table.
+
+# to find them: need to make it match first before adding the foreign key 
+SELECT DISTINCT pgr.parameter_id
+FROM Parameter_Group_relation pgr
+LEFT JOIN Parameter_Description pd
+       ON pgr.parameter_id = pd.parameter_id
+WHERE pd.parameter_id IS NULL;
+
+SELECT COUNT(*) FROM Parameter_Group_relation;
+SELECT * FROM Parameter_Group_relation pgr  LIMIT 10;
+
+ALTER TABLE Parameter_Group_relation
+ADD FOREIGN KEY (parameter_id)
+REFERENCES Parameter_Description(parameter_id);
+
+
+SELECT parameter_id, LENGTH(parameter_id)
+FROM Parameter_Description;
+# the values of parameter id do not match code below tells us which ones  - need to put catergory table into parameter description table and get rid off pgr table.
+SELECT DISTINCT pgr.parameter_id
+FROM parameter_group_relation pgr
+LEFT JOIN Parameter_Description pd ON pgr.parameter_id = pd.parameter_id
+WHERE pd.parameter_id IS NULL; 
+
+#Unable to link data to pd, to check why? - reason is those extra parameter id, are not in the parameter id in data 
+SELECT pgr.parameter_id
+FROM Parameter_Group_relation pgr
+LEFT JOIN Parameter_Description pd
+       ON pgr.parameter_id = pd.parameter_id
+WHERE pd.parameter_id IS NULL; 
+
+#reason i cant add a fk to between pd and pgr might because because of the intial data table , thus why i cant add an fk between data and pd. to chech the issue in data table use:
+SHOW CREATE TABLE data;
+SHOW CREATE TABLE parameter_description;
+
+SELECT d.parameter_id
+FROM Data d
+LEFT JOIN Parameter_Description p
+       ON d.parameter_id = p.parameter_id
+WHERE p.parameter_id IS NULL;
+
+SELECT DISTINCT pgr.parameter_id
+FROM parameter_group_relation pgr
+LEFT JOIN parameter_description pd 
+       ON pgr.parameter_id = pd.parameter_id
+WHERE pd.parameter_id IS NULL;
