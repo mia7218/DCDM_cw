@@ -77,7 +77,7 @@ SET
     parameter_id = NULLIF(TRIM(@csv_col4), ''),
     name = NULLIF(TRIM(@csv_col2), ''),
     description = NULLIF(TRIM(@csv_col3), ''),
-    IMPC_parameter_origin_id = NULLIF(TRIM(@csv_col1), '');;
+    IMPC_parameter_origin_id = NULLIF(TRIM(@csv_col1), '');
 
 select * from  Parameter_Description 
 
