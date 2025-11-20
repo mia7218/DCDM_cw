@@ -71,7 +71,13 @@ INTO TABLE  Parameter_Description
 FIELDS TERMINATED BY ','
 OPTIONALLY ENCLOSED BY '"'
 LINES TERMINATED BY '\r\n'
-IGNORE 1 lines;
+IGNORE 1 lines
+(@csv_col1, @csv_col2, @csv_col3, @csv_col4)
+SET
+    parameter_id = NULLIF(TRIM(@csv_col4), ''),
+    name = NULLIF(TRIM(@csv_col2), ''),
+    description = NULLIF(TRIM(@csv_col3), ''),
+    IMPC_parameter_origin_id = NULLIF(TRIM(@csv_col1), '');;
 
 select * from  Parameter_Description 
 
