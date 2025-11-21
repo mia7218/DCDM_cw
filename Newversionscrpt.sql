@@ -33,7 +33,7 @@ SET
   mouse_strain      = NULLIF(TRIM(@mouse_strain),''),
   mouse_life_stage  = NULLIF(TRIM(@mouse_life_stage),''),
   parameter_id      = NULLIF(TRIM(@parameter_id),''),
-  pvalue            = CASE WHEN TRIM(@pvalue) = '' THEN NULL ELSE @pvalue END
+  pvalue            = CASE WHEN TRIM(@pvalue) = '' THEN NULL ELSE @pvalue END;
 
 select * from datamain 
 
