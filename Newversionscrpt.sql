@@ -7,8 +7,7 @@ CREATE TABLE Datamain (
     mouse_strain      VARCHAR(20),
     mouse_life_stage  VARCHAR(50),
     parameter_id      VARCHAR(50) NOT NULL,
-    pvalue            DOUBLE,
-    parameter_name    VARCHAR(255)
+    pvalue            DOUBLE
 );
 
 #Load data into Data table
@@ -25,8 +24,7 @@ IGNORE 1 LINES
   @mouse_strain,
   @mouse_life_stage,
   @parameter_id,
-  @pvalue,
-  @parameter_name
+  @pvalue
 )
 SET
   analysis_id       = NULLIF(TRIM(@analysis_id),''),
@@ -35,10 +33,10 @@ SET
   mouse_strain      = NULLIF(TRIM(@mouse_strain),''),
   mouse_life_stage  = NULLIF(TRIM(@mouse_life_stage),''),
   parameter_id      = NULLIF(TRIM(@parameter_id),''),
-  pvalue            = CASE WHEN TRIM(@pvalue) = '' THEN NULL ELSE @pvalue END,
-  parameter_name    = NULLIF(TRIM(@parameter_name),'');
+  pvalue            = CASE WHEN TRIM(@pvalue) = '' THEN NULL ELSE @pvalue END
 
 select * from datamain 
+
 
 #Create Human Disease Table
 CREATE TABLE Human_Disease (
