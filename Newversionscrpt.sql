@@ -226,3 +226,116 @@ ALTER TABLE  Group_Parameter
 ADD CONSTRAINT parameter_id3
 FOREIGN KEY (parameter_id)
 REFERENCES impc_parameter_id  (parameter_id);
+
+
+#The 4 Queries
+
+# 1. Larp6
+
+SELECT 
+    d.gene_symbol AS gene,
+    d.gene_accession_id AS mgi_id,
+    d.parameter_id,
+    pd.name AS parameter_name,
+    gp.Category AS parameter_group,
+    d.pvalue,
+    hd.DO_disease_id,
+    hd.DO_disease_name,
+    hd.OMIM_id,
+    pp.procedure_name,
+    pp.procedure_description,
+    pp.is_mandatory
+FROM Datamain d
+LEFT JOIN Parameter_Description pd 
+       ON d.parameter_id = pd.parameter_id
+LEFT JOIN Group_Parameter gp
+       ON d.parameter_id = gp.parameter_id
+LEFT JOIN Human_Disease hd
+       ON d.gene_accession_id = hd.Mouse_MGI_ID
+LEFT JOIN Phenotype_Procedure pp
+       ON pd.IMPC_parameter_origin_id = pp.IMPC_parameter_origin_id
+WHERE d.gene_symbol = 'Larp6'
+ORDER BY d.parameter_id;
+
+#2. Ap2s1 
+
+SELECT 
+    d.gene_symbol AS gene,
+    d.gene_accession_id AS mgi_id,
+    d.parameter_id,
+    pd.name AS parameter_name,
+    gp.Category AS parameter_group,
+    d.pvalue,
+    hd.DO_disease_id,
+    hd.DO_disease_name,
+    hd.OMIM_id,
+    pp.procedure_name,
+    pp.procedure_description,
+    pp.is_mandatory
+FROM Datamain d
+LEFT JOIN Parameter_Description pd 
+       ON d.parameter_id = pd.parameter_id
+LEFT JOIN Group_Parameter gp
+       ON d.parameter_id = gp.parameter_id
+LEFT JOIN Human_Disease hd
+       ON d.gene_accession_id = hd.Mouse_MGI_ID
+LEFT JOIN Phenotype_Procedure pp
+       ON pd.IMPC_parameter_origin_id = pp.IMPC_parameter_origin_id
+WHERE d.gene_symbol = 'Ap2s1'
+ORDER BY d.parameter_id;
+
+#3. Tm4sf19
+
+SELECT 
+    d.gene_symbol AS gene,
+    d.gene_accession_id AS mgi_id,
+    d.parameter_id,
+    pd.name AS parameter_name,
+    gp.Category AS parameter_group,
+    d.pvalue,
+    hd.DO_disease_id,
+    hd.DO_disease_name,
+    hd.OMIM_id,
+    pp.procedure_name,
+    pp.procedure_description,
+    pp.is_mandatory
+FROM Datamain d
+LEFT JOIN Parameter_Description pd 
+       ON d.parameter_id = pd.parameter_id
+LEFT JOIN Group_Parameter gp
+       ON d.parameter_id = gp.parameter_id
+LEFT JOIN Human_Disease hd
+       ON d.gene_accession_id = hd.Mouse_MGI_ID
+LEFT JOIN Phenotype_Procedure pp
+       ON pd.IMPC_parameter_origin_id = pp.IMPC_parameter_origin_id
+WHERE d.gene_symbol = 'Tm4sf19'
+ORDER BY d.parameter_id;
+
+#4. Fam72a
+
+SELECT 
+    d.gene_symbol AS gene,
+    d.gene_accession_id AS mgi_id,
+    d.parameter_id,
+    pd.name AS parameter_name,
+    gp.Category AS parameter_group,
+    d.pvalue,
+    hd.DO_disease_id,
+    hd.DO_disease_name,
+    hd.OMIM_id,
+    pp.procedure_name,
+    pp.procedure_description,
+    pp.is_mandatory
+FROM Datamain d
+LEFT JOIN Parameter_Description pd 
+       ON d.parameter_id = pd.parameter_id
+LEFT JOIN Group_Parameter gp
+       ON d.parameter_id = gp.parameter_id
+LEFT JOIN Human_Disease hd
+       ON d.gene_accession_id = hd.Mouse_MGI_ID
+LEFT JOIN Phenotype_Procedure pp
+       ON pd.IMPC_parameter_origin_id = pp.IMPC_parameter_origin_id
+WHERE d.gene_symbol = 'Fam72a'
+ORDER BY d.parameter_id;
+
+---It works, however the disease and procedure information comes up as null--- 
