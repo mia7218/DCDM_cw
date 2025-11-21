@@ -1,3 +1,5 @@
+-- Create and Populate Base Tables --
+#Create Data table
 CREATE TABLE Datamain (
     analysis_id       VARCHAR(20) NOT NULL PRIMARY KEY,
     gene_accession_id VARCHAR(20) NOT NULL,
@@ -9,7 +11,8 @@ CREATE TABLE Datamain (
     parameter_name    VARCHAR(255)
 );
 
-LOAD DATA LOCAL INFILE 'E:/桌面/Group4/clean_data.csv'
+#Load data into Data table
+LOAD DATA LOCAL INFILE '/Users/maisievarcoe/Desktop/DCDM/Group_Project/clean_data.csv'
 INTO TABLE Datamain
 FIELDS TERMINATED BY ','
 OPTIONALLY ENCLOSED BY '"'
@@ -37,7 +40,7 @@ SET
 
 select * from datamain 
 
-
+#Create Human Disease Table
 CREATE TABLE Human_Disease (
     DO_disease_id   VARCHAR(15) NOT NULL PRIMARY KEY,
     DO_disease_name VARCHAR(70),
@@ -45,20 +48,17 @@ CREATE TABLE Human_Disease (
     Mouse_MGI_ID    VARCHAR(50)
 );
 
-
-
-LOAD DATA LOCAL INFILE 'E:/桌面/Group4/Cleaned_disease_info.csv'
+#Load data into Human Disease Table
+LOAD DATA LOCAL INFILE '/Users/maisievarcoe/Desktop/DCDM/Group_Project/Cleaned_disease_info.csv'
 INTO TABLE Human_Disease
 FIELDS TERMINATED BY ','
 OPTIONALLY ENCLOSED BY '"'
-LINES TERMINATED BY '\r\n'
+LINES TERMINATED BY '\n'
 IGNORE 1 lines;
-
 
 select * from Human_Disease
 
-
-
+#Create Parameter Description table
 CREATE TABLE Parameter_Description (
     parameter_id             VARCHAR(50) NOT NULL PRIMARY KEY,
     name                     VARCHAR(255) NOT NULL,
@@ -66,12 +66,13 @@ CREATE TABLE Parameter_Description (
     IMPC_parameter_origin_id VARCHAR(320)
 );
 
-LOAD DATA LOCAL INFILE 'E:/桌面/Group4/updated_parameter_descriptions.csv'
-INTO TABLE  Parameter_Description 
+#Load data into Parameter Description table
+LOAD DATA LOCAL INFILE '/Users/maisievarcoe/Desktop/DCDM/Group_Project/updated_parameter_descriptions.csv'
+INTO TABLE Parameter_Description
 FIELDS TERMINATED BY ','
 OPTIONALLY ENCLOSED BY '"'
-LINES TERMINATED BY '\r\n'
-IGNORE 1 lines
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES
 (@csv_col1, @csv_col2, @csv_col3, @csv_col4)
 SET
     parameter_id = NULLIF(TRIM(@csv_col4), ''),
@@ -81,8 +82,7 @@ SET
 
 select * from  Parameter_Description 
 
-
-
+#Create Phenotype Procedure table
 CREATE TABLE Phenotype_Procedure (
     IMPC_parameter_origin_id VARCHAR(100) NOT NULL PRIMARY KEY,
     procedure_name           VARCHAR(100),
@@ -91,8 +91,8 @@ CREATE TABLE Phenotype_Procedure (
     
 );
 
-
-LOAD DATA LOCAL INFILE 'E:/桌面/Group4/Cleaned_procedures.csv '
+#Load data into Phenotype Procedure table 
+LOAD DATA LOCAL INFILE '/Users/maisievarcoe/Desktop/DCDM/Group_Project/Cleaned_procedures.csv'
 INTO TABLE Phenotype_Procedure
 FIELDS TERMINATED BY ','
 OPTIONALLY ENCLOSED BY '"'
@@ -110,44 +110,34 @@ SET is_mandatory = CASE UPPER(@is_mandatory)
     ELSE NULL
 END;
 
-
 select * from  Phenotype_Procedure
 
 
+-- Create Reference Tables --
+#Create IMPC Parameter ID table
 CREATE TABLE IMPC_Parameter_id (
     parameter_id VARCHAR(255) PRIMARY KEY
 );
 
-
+#Insert data IMPC Parameter ID table
 INSERT INTO impc_Parameter_id (parameter_id)
 SELECT DISTINCT parameter_id
 FROM (
     SELECT parameter_id FROM datamain
     UNION
-    SELECT IMPC_parameter_origin_id AS parameter_id FROM parameter_description
+    SELECT parameter_id FROM parameter_description
 ) AS t;
 
-select * from  impc_Parameter_id 
+select * from  impc_Parameter_id;
 
+DELETE from IMPC_Parameter_id;
 
-ALTER TABLE parameter_description 
-ADD CONSTRAINT IMPC_parameter_origin_id
-FOREIGN KEY (IMPC_parameter_origin_id)
-REFERENCES impc_parameter_id(parameter_id);
-
-
-ALTER TABLE datamain  
-ADD CONSTRAINT parameter_id
-FOREIGN KEY (parameter_id)
-REFERENCES impc_parameter_id(parameter_id);
-
-
-
+#Create IMPC Origin ID
 CREATE TABLE IMPC_origin_id (
     origin_id VARCHAR(255) PRIMARY KEY
 );
 
-
+#Insert data into IMPC Origin ID table 
 INSERT INTO impc_origin_id (origin_id)
 SELECT DISTINCT origin_id
 FROM (
@@ -157,6 +147,36 @@ FROM (
 ) AS t;
 
 select * from impc_origin_id
+
+#Create MGI Acession ID table
+CREATE TABLE mgi (
+    mgi_id VARCHAR(255) not null primary key
+  
+);
+
+#Insert data into mgi table 
+INSERT INTO mgi (mgi_id)
+SELECT DISTINCT gene_accession_id
+FROM (
+    select  gene_accession_id  FROM datamain 
+    UNION
+    SELECT  Mouse_MGI_ID  FROM human_disease 
+) AS t;
+
+select * from mgi
+
+
+-- Foreign Keys --
+ALTER TABLE parameter_description
+ADD CONSTRAINT parameter_id
+FOREIGN KEY (parameter_id)
+REFERENCES impc_parameter_id(parameter_id);
+
+
+ALTER TABLE datamain  
+ADD CONSTRAINT parameter_id2
+FOREIGN KEY (parameter_id)
+REFERENCES impc_parameter_id(parameter_id);
 
 
 ALTER TABLE  parameter_description 
@@ -169,24 +189,6 @@ ADD CONSTRAINT origin_id2
 FOREIGN KEY (IMPC_parameter_origin_id)
 REFERENCES impc_origin_id(origin_id);
 
-
-CREATE TABLE mgi (
-    mgi_id VARCHAR(255) not null primary key
-  
-);
-
-
-INSERT INTO mgi (mgi_id)
-SELECT DISTINCT gene_accession_id
-FROM (
-    select  gene_accession_id  FROM datamain 
-    UNION
-    SELECT  Mouse_MGI_ID  FROM human_disease 
-) AS t;
-
-
-select * from mgi
-
 ALTER TABLE  datamain
 ADD CONSTRAINT gene_accession_id 
 FOREIGN KEY (gene_accession_id )
@@ -197,43 +199,32 @@ ADD CONSTRAINT gene_accession_id2
 FOREIGN KEY (Mouse_MGI_ID)
 REFERENCES mgi (mgi_id);
 
+
+
+-- Create Dependent Table, import data and add foreign key --
+
+#Create Group Parameter table
 create table Group_Parameter (
 	parameter_id Varchar(50) not null primary key,
 	Category Varchar(300)
 )
 
-
-LOAD DATA LOCAL INFILE 'E:/桌面/Group4/Parameter_groupings.csv'
+#Load data into Group Parameter table 
+LOAD DATA LOCAL INFILE '/Users/maisievarcoe/Desktop/DCDM/Group_Project/Parameter_groupings.csv'
 INTO TABLE Group_Parameter
 FIELDS TERMINATED BY ','
 OPTIONALLY ENCLOSED BY '"'
-LINES TERMINATED BY '\r\n'
+LINES TERMINATED BY '\n'
 IGNORE 1 LINES
 (@parameter_id, @category)
 SET
   parameter_id = NULLIF(TRIM(@parameter_id),''),
   Category   = NULLIF(TRIM(@category),'');
 
-
-ALTER TABLE  Group_Parameter
-ADD CONSTRAINT parameter_id
-FOREIGN KEY (parameter_id )
-REFERENCES impc_parameter_id  (parameter_id);
-
 select * from Group_Parameter
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#add foreign key 
+ALTER TABLE  Group_Parameter
+ADD CONSTRAINT parameter_id3
+FOREIGN KEY (parameter_id)
+REFERENCES impc_parameter_id  (parameter_id);
