@@ -2,7 +2,7 @@
 
 This is a GitHub repository for King’s College London Data Cleaning and Data Management coursework, Group 4.
 
-Data contains the original merged data files, which is the raw data hasnt been cleaned at all right.
+The Data folder contains the original merged data files, which is the raw data hasnt been cleaned at all right.
 
 The metadata folder contains all the other original files like the SOP, disease info, parameter descriptions etc
 
